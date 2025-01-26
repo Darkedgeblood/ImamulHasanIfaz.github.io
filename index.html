@@ -31,24 +31,21 @@
       color: #555;
     }
 
-    /* Social Links */
-    .socials {
-      margin-top: 1.5rem;
+    /* Contact Info Section */
+    .contact {
+      margin: 2rem 0;
     }
 
-    .socials a {
+    .contact a {
       text-decoration: none;
-      color: #fff;
-      background-color: #0073e6;
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
-      margin: 0 0.5rem;
-      display: inline-block;
-      transition: background 0.3s;
+      color: #0073e6;
+      font-size: 1.2rem;
+      margin: 0.5rem 0;
+      display: block;
     }
 
-    .socials a:hover {
-      background-color: #005bb5;
+    .contact a:hover {
+      text-decoration: underline;
     }
 
     /* Hamburger Menu Styling */
@@ -118,12 +115,14 @@
     <p>Welcome to my personal website! I'm passionate about technology, programming, and connecting with amazing people.</p>
   </header>
 
-  <!-- Social Links -->
-  <div class="socials">
-    <a href="https://linkedin.com/in/imamulhasanifaz" target="_blank">LinkedIn</a>
-    <a href="https://github.com/imamulhasanifaz" target="_blank">GitHub</a>
-    <a href="https://twitter.com/imamulhasanifaz" target="_blank">Twitter</a>
-  </div>
+  <!-- Contact Info Section -->
+  <section class="contact">
+    <h2>Contact Me</h2>
+    <a href="#" onclick="copyPhoneNumber()">Phone: +8801703690576</a>
+    <a href="https://www.facebook.com/SIUuuu77/" target="_blank">Facebook</a>
+    <a href="https://www.linkedin.com/in/imamul-hasan-ifaz-02a618194/" target="_blank">LinkedIn</a>
+    <a href="https://github.com/Darkedgeblood" target="_blank">GitHub</a>
+  </section>
 
   <!-- Hamburger Menu Icon -->
   <div class="hamburger-menu" onclick="toggleMenu()">
@@ -158,6 +157,13 @@
     function toggleMenu() {
       const menu = document.getElementById('menu');
       menu.classList.toggle('open');
+    }
+
+    // JavaScript to copy the phone number to clipboard
+    function copyPhoneNumber() {
+      navigator.clipboard.writeText("+8801703690576").then(() => {
+        alert("Phone number copied to clipboard!");
+      });
     }
   </script>
 </body>
