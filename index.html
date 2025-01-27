@@ -200,7 +200,7 @@
 </head>
 <body>
   <!-- Hamburger Menu -->
-  <div class="hamburger" onclick="toggleMenu()">
+  <div class="hamburger" onclick="toggleMenu(event)">
     <div></div>
     <div></div>
     <div></div>
@@ -247,10 +247,20 @@
   </div>
 
   <script>
-    function toggleMenu() {
+    function toggleMenu(event) {
       const menu = document.getElementById('menu');
       menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+      event.stopPropagation(); // Prevent click from propagating to the document
     }
+
+    document.addEventListener('click', () => {
+      const menu = document.getElementById('menu');
+      menu.style.display = 'none';
+    });
+
+    document.getElementById('menu').addEventListener('click', (event) => {
+      event.stopPropagation(); // Prevent closing the menu when clicking inside it
+    });
   </script>
 </body>
 </html>
