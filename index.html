@@ -1,68 +1,281 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Imamul Hasan Ifaz - Portfolio</title>
-    <style>
-        /* General styling for the webpage */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-        header {
-            background-color: #0077b6;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        main {
-            flex: 1;
-            padding: 20px;
-        }
-        footer {
-            text-align: center;
-            padding: 10px 0;
-            background-color: #f4f4f4;
-            color: #555;
-            font-size: 14px;
-            margin-top: auto;
-            border-top: 1px solid #ddd;
-        }
-        footer a {
-            color: #0077b6;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        footer a:hover {
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Imamul Hasan Ifaz</title>
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico:wght@700&family=Figtree:wght@400&family=Rubik:wght@400&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Figtree', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      min-height: 100vh;
+      background-color: #f8f8f8;
+    }
+
+    /* Hamburger Menu */
+    .hamburger {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .hamburger div {
+      width: 30px;
+      height: 4px;
+      background-color: #333;
+    }
+
+    .menu {
+      position: absolute;
+      top: 70px;
+      left: 20px;
+      background-color: #ffffff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      padding: 10px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: #333;
+      font-size: 1rem;
+      padding: 5px 10px;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .menu a:hover {
+      background-color: #f0f0f0;
+    }
+
+    /* Left Section Styling */
+    .left-section {
+      flex: 1;
+      background-color: #ffffff;
+      text-align: center;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .left-section img {
+      width: 180px;
+      height: 180px;
+      border-radius: 0; /* Squared */
+      margin-bottom: 20px;
+    }
+
+    .left-section h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      font-family: 'Pacifico', cursive; /* Pacifico Font */
+    }
+
+    .left-section h2 {
+      font-size: 1.5rem;
+      font-family: 'Figtree', sans-serif;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .email-btn {
+      background-color: #333;
+      color: #fff;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      font-family: 'Rubik', sans-serif;
+      margin-bottom: 20px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .email-btn:hover {
+      background-color: #555;
+    }
+
+    /* Social Links Section */
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    .social-links a img {
+      width: 50px;
+      height: 50px;
+      transition: transform 0.3s;
+    }
+
+    .social-links a img:hover {
+      transform: scale(1.1);
+    }
+
+    /* Right Section Styling */
+    .right-section {
+      flex: 1;
+      background-color: #ebebeb;
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .right-section h1 {
+      font-size: 2.5rem;
+      font-family: 'Pacifico', cursive;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .right-section p {
+      font-size: 1.2rem;
+      font-family: 'Figtree', sans-serif;
+      color: #555;
+      line-height: 1.8;
+      margin-bottom: 40px;
+    }
+
+    .right-section .buttons {
+      display: flex;
+      gap: 30px;
+    }
+
+    .right-section .btn {
+      background-color: #333;
+      color: #fff;
+      text-decoration: none;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      font-family: 'Rubik', sans-serif;
+      transition: background-color 0.3s;
+      text-align: center;
+    }
+
+    .right-section .btn:hover {
+      background-color: #555;
+    }
+
+    /* Footer Styling */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 1rem;
+      background-color: #333;
+      color: #fff;
+      margin-top: auto;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .left-section, .right-section {
+        flex: unset;
+        width: 100%;
+        text-align: center;
+      }
+
+      .right-section .buttons {
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .social-links {
+        gap: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to My Website</h1>
-        <p>Showcasing my work and projects</p>
-    </header>
-    <main>
-        <h2>About Me</h2>
-        <p>Hi, I'm Imamul Hasan Ifaz, a passionate learner and aspiring web developer. This website is a space to share my portfolio, ideas, and more.</p>
-        
-        <h2>Projects</h2>
-        <ul>
-            <li><strong>Project 1:</strong> A cool web app I built.</li>
-            <li><strong>Project 2:</strong> A responsive design project for modern web browsers.</li>
-        </ul>
-    </main>
-    <footer>
-        © <script>document.write(new Date().getFullYear());</script> Imamul Hasan Ifaz. All rights reserved. 
-        <br>
-        Built with ❤️ by <a href="#">Imamul Hasan Ifaz</a>.
-    </footer>
+  <!-- Hamburger Menu -->
+  <div class="hamburger" onclick="toggleMenu(event)">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+  <div class="menu" id="menu">
+    <a href="#advertise">Advertise</a>
+    <a href="#terms">Terms of Use</a>
+    <a href="#privacy">Privacy Policy</a>
+  </div>
+
+  <!-- Left Section -->
+  <div class="left-section">
+    <img src="profile.jpg" alt="Profile Picture">
+    <h1>Imamul Hasan Ifaz</h1>
+    <h2>Game Developer</h2>
+    <a href="mailto:imamul@example.com" class="email-btn">Email me</a>
+    <!-- Social Links -->
+    <div class="social-links">
+      <a href="https://www.facebook.com/SIUuuu77/" target="_blank">
+        <img src="icon 1.png" alt="Facebook">
+      </a>
+      <a href="https://github.com/Darkedgeblood" target="_blank">
+        <img src="icon 2.png" alt="GitHub">
+      </a>
+      <a href="https://x.com/imamulHasanifAz" target="_blank">
+        <img src="icon 3.png" alt="X.com">
+      </a>
+    </div>
+  </div>
+
+  <!-- Right Section -->
+  <div class="right-section">
+    <h1>About Me</h1>
+    <p>
+      I am a tech-savvy individual with a Bachelor's degree in Software Development, 
+      seeking employment as a mobile game developer. I am passionate about consistently 
+      advancing my knowledge and skills. I have attended multiple seminars and boot camps 
+      on coding and game development.
+    </p>
+    <div class="buttons">
+      <a href="resume.pdf" class="btn" download="Imamul_Hasan_Ifaz_Resume.pdf">Resume</a>
+      <a href="portfolio.html" class="btn">Portfolio</a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    © 2025 Imamul Hasan Ifaz. All rights reserved.
+  </footer>
+
+  <script>
+    function toggleMenu(event) {
+      const menu = document.getElementById('menu');
+      menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+      event.stopPropagation(); // Prevent click from propagating to the document
+    }
+
+    document.addEventListener('click', () => {
+      const menu = document.getElementById('menu');
+      menu.style.display = 'none';
+    });
+
+    document.getElementById('menu').addEventListener('click', (event) => {
+      event.stopPropagation(); // Prevent closing the menu when clicking inside it
+    });
+  </script>
 </body>
 </html>
