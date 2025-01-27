@@ -75,7 +75,7 @@
     .left-section img {
       width: 150px;
       height: 150px;
-      border-radius: 50%;
+      border-radius: 0; /* Changed from circular to squared */
       margin-bottom: 20px;
     }
 
@@ -115,15 +115,14 @@
       margin-top: 10px;
     }
 
-    .social-links a {
-      text-decoration: none;
-      color: #333;
-      font-size: 1.8rem;
-      transition: color 0.3s;
+    .social-links a img {
+      width: 40px;
+      height: 40px;
+      transition: transform 0.3s;
     }
 
-    .social-links a:hover {
-      color: #0073e6;
+    .social-links a img:hover {
+      transform: scale(1.1);
     }
 
     /* Right Section Styling */
@@ -201,11 +200,17 @@
     <h1>Imamul Hasan</h1>
     <h2>Game Developer</h2>
     <a href="mailto:imamul@example.com" class="email-btn">Email me</a>
-    <!-- Updated Social Links -->
+    <!-- Updated Social Links with Icons -->
     <div class="social-links">
-      <a href="https://www.facebook.com/SIUuuu77/" target="_blank">🌐</a>
-      <a href="https://github.com/Darkedgeblood" target="_blank">👨‍💻</a>
-      <a href="https://x.com/imamulHasanifAz" target="_blank">🐦</a>
+      <a href="https://www.facebook.com/SIUuuu77/" target="_blank">
+        <img src="icon 1.png" alt="Facebook">
+      </a>
+      <a href="https://github.com/Darkedgeblood" target="_blank">
+        <img src="icon 2.png" alt="GitHub">
+      </a>
+      <a href="https://x.com/imamulHasanifAz" target="_blank">
+        <img src="icon 3.png" alt="X.com">
+      </a>
     </div>
   </div>
 
