@@ -6,164 +6,164 @@
   <title>Imamul Hasan Ifaz</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* General Body Styling */
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", Arial, sans-serif;
+      font-family: 'Roboto', sans-serif;
       margin: 0;
       padding: 0;
-      background: linear-gradient(120deg, #fdfbfb, #ebedee);
-      color: #333;
+      display: flex;
+      flex-wrap: wrap;
+      min-height: 100vh;
+    }
+
+    /* Left Section Styling */
+    .left-section {
+      flex: 1;
+      background-color: #ffffff;
       text-align: center;
-    }
-
-    /* Header Section */
-    header {
-      margin: 2rem 0;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      color: #222;
-    }
-
-    p {
-      font-size: 1.2rem;
-      color: #555;
-    }
-
-    /* Profile Picture Styling */
-    .profile-pic {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    /* Contact Info Section */
-    .contact {
-      margin: 2rem 0;
-    }
-
-    .contact a {
-      text-decoration: none;
-      color: #0073e6;
-      font-size: 1.2rem;
-      margin: 0.5rem 0;
-      display: block;
-    }
-
-    .contact a:hover {
-      text-decoration: underline;
-    }
-
-    /* Hamburger Menu Styling */
-    .hamburger-menu {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      cursor: pointer;
-      z-index: 10;
-    }
-
-    .hamburger-menu div {
-      width: 30px;
-      height: 3px;
-      background-color: #333;
-      margin: 6px 0;
-      transition: 0.3s;
-    }
-
-    /* Navigation Menu */
-    .menu {
-      position: fixed;
-      top: 0;
-      right: 0;
-      height: 100%;
-      width: 250px;
-      background: #0073e6;
-      transform: translateX(100%);
-      transition: transform 0.3s ease-in-out;
-      color: white;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     }
 
-    .menu a {
-      color: white;
+    .left-section img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+    }
+
+    .left-section h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .left-section h2 {
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .email-btn {
+      background-color: #333;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      cursor: pointer;
       text-decoration: none;
+    }
+
+    .email-btn:hover {
+      background-color: #555;
+    }
+
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .social-icons a {
+      text-decoration: none;
+      color: #333;
       font-size: 1.5rem;
-      margin: 1rem 0;
       transition: color 0.3s;
     }
 
-    .menu a:hover {
-      color: #ddd;
+    .social-icons a:hover {
+      color: #0073e6;
     }
 
-    .menu.open {
-      transform: translateX(0);
+    /* Right Section Styling */
+    .right-section {
+      flex: 1;
+      background-color: #ebebeb;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
-    /* Footer Styling */
-    footer {
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: #888;
+    .right-section h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .right-section p {
+      font-size: 1rem;
+      color: #555;
+      line-height: 1.5;
+      margin-bottom: 30px;
+    }
+
+    .right-section .buttons {
+      display: flex;
+      gap: 20px;
+    }
+
+    .right-section .btn {
+      background-color: #333;
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 5px;
+      text-align: center;
+      transition: background-color 0.3s;
+    }
+
+    .right-section .btn:hover {
+      background-color: #555;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .left-section, .right-section {
+        flex: unset;
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Header Section -->
-  <header>
-    <img src="profile.jpg" alt="Profile Picture" class="profile-pic">
-    <h1>Imamul Hasan Ifaz</h1>
-    <p>Welcome to my personal website! I'm passionate about technology, programming, and connecting with amazing people.</p>
-  </header>
-
-  <!-- Contact Info Section -->
-  <section class="contact">
-    <h2>Contact Me</h2>
-    <a href="#" onclick="copyPhoneNumber()">Phone: +8801703690576</a>
-    <a href="https://www.facebook.com/SIUuuu77/" target="_blank">Facebook</a>
-    <a href="https://www.linkedin.com/in/imamul-hasan-ifaz-02a618194/" target="_blank">LinkedIn</a>
-    <a href="https://github.com/Darkedgeblood" target="_blank">GitHub</a>
-  </section>
-
-  <!-- Hamburger Menu Icon -->
-  <div class="hamburger-menu" onclick="toggleMenu()">
-    <div></div>
-    <div></div>
-    <div></div>
+  <!-- Left Section -->
+  <div class="left-section">
+    <img src="profile.jpg" alt="Profile Picture">
+    <h1>Imamul Hasan</h1>
+    <h2>Game Developer</h2>
+    <a href="mailto:imamul@example.com" class="email-btn">Email me</a>
+    <div class="social-icons">
+      <a href="https://www.facebook.com/SIUuuu77/" target="_blank">🌐</a>
+      <a href="https://www.linkedin.com/in/imamul-hasan-ifaz-02a618194/" target="_blank">💼</a>
+      <a href="https://github.com/Darkedgeblood" target="_blank">👨‍💻</a>
+    </div>
   </div>
 
-  <!-- Navigation Menu -->
-  <div class="menu" id="menu">
-    <a href="#about">About</a>
-    <a href="#contact">Contact Me</a>
-    <a href="#media">Media</a>
+  <!-- Right Section -->
+  <div class="right-section">
+    <h1>About Me</h1>
+    <p>
+      I am a tech-savvy individual with a Bachelor's degree in Software Development, 
+      seeking employment as a mobile game developer. I am passionate about consistently 
+      advancing my knowledge and skills. I have attended multiple seminars and boot camps 
+      on coding and game development.
+    </p>
+    <div class="buttons">
+      <a href="resume.pdf" class="btn" target="_blank">Resume</a>
+      <a href="portfolio.html" class="btn">Portfolio</a>
+    </div>
   </div>
-
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2025 Imamul Hasan Ifaz. All rights reserved.</p>
-  </footer>
-
-  <script>
-    // JavaScript to toggle the menu
-    function toggleMenu() {
-      const menu = document.getElementById('menu');
-      menu.classList.toggle('open');
-    }
-
-    // JavaScript to copy the phone number to clipboard
-    function copyPhoneNumber() {
-      navigator.clipboard.writeText("+8801703690576").then(() => {
-        alert("Phone number copied to clipboard!");
-      });
-    }
-  </script>
 </body>
 </html>
