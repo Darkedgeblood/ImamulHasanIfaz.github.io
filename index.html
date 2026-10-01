@@ -76,6 +76,10 @@
     /* Hero */
     .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 100px 24px 60px; position: relative; overflow: hidden; }
     .hero-bg { position: absolute; inset: 0; background: radial-gradient(circle at 20% 50%, rgba(37,99,235,0.04) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(37,99,235,0.03) 0%, transparent 50%); pointer-events: none; }
+    /* Cloud video: covers only the opening screen and fades out at the bottom, revealing the dot wallpaper */
+    .hero-video { position: absolute; inset: 0; z-index: 0; pointer-events: none; -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 100%); mask-image: linear-gradient(to bottom, #000 72%, transparent 100%); }
+    .hero-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero-video::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.35); } /* keeps dark text readable; raise for brighter clouds */
     .hero-content { max-width: 900px; text-align: center; position: relative; z-index: 1; }
     .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; background: var(--accent-soft); color: var(--accent); border-radius: 100px; font-size: 0.85rem; font-weight: 600; margin-bottom: 24px; border: 1px solid rgba(37,99,235,0.15); animation: fadeInUp 0.6s ease-out; }
     .hero-badge::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
@@ -177,6 +181,7 @@
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
+      .hero-video video { display: none; }
       *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
     }
   </style>
@@ -207,6 +212,11 @@
 
   <!-- Hero -->
   <section class="hero" id="home">
+    <div class="hero-video" aria-hidden="true">
+      <video autoplay muted loop playsinline preload="auto">
+        <source src="clouds.mp4" type="video/mp4">
+      </video>
+    </div>
     <div class="hero-bg"></div>
     <div class="hero-content">
       <div class="hero-badge">Available for opportunities</div>
