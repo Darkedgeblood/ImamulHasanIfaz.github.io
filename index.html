@@ -74,12 +74,13 @@
     .mobile-menu a:hover { background: rgba(37,99,235,0.08); color: var(--accent); }
 
     /* Hero */
-    .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 100px 24px 60px; position: relative; overflow: hidden; }
+    .hero { max-width: 100%; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 100px 24px 60px; position: relative; overflow: hidden; }
     .hero-bg { position: absolute; inset: 0; background: radial-gradient(circle at 20% 50%, rgba(37,99,235,0.04) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(37,99,235,0.03) 0%, transparent 50%); pointer-events: none; }
     /* Cloud video: covers only the opening screen and fades out at the bottom, revealing the dot wallpaper */
     .hero-video { position: absolute; inset: 0; z-index: 0; pointer-events: none; -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 100%); mask-image: linear-gradient(to bottom, #000 72%, transparent 100%); }
-    .hero-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .hero-video::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.35); } /* keeps dark text readable; raise for brighter clouds */
+    .hero-video video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity 2s linear; }
+    .hero-video video:first-child { opacity: 1; }
+    .hero-video::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.4); } /* keeps dark text readable; raise for brighter clouds */
     .hero-content { max-width: 900px; text-align: center; position: relative; z-index: 1; }
     .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; background: var(--accent-soft); color: var(--accent); border-radius: 100px; font-size: 0.85rem; font-weight: 600; margin-bottom: 24px; border: 1px solid rgba(37,99,235,0.15); animation: fadeInUp 0.6s ease-out; }
     .hero-badge::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
@@ -87,7 +88,7 @@
     .hero h1 .accent { color: var(--accent); position: relative; }
     .typing-text { display: inline-block; border-right: 3px solid var(--accent); animation: blink 0.7s step-end infinite; white-space: nowrap; overflow: hidden; min-height: 1.1em; }
     @keyframes blink { 50% { border-color: transparent; } }
-    .hero-subtitle { font-size: clamp(1rem, 2.5vw, 1.35rem); color: var(--text-secondary); font-weight: 400; margin: 0 auto 32px; max-width: 600px; animation: fadeInUp 0.6s ease-out 0.2s both; }
+    .hero-subtitle { font-size: clamp(1rem, 2.5vw, 1.35rem); color: #1e293b; font-weight: 500; margin: 0 auto 32px; max-width: 600px; animation: fadeInUp 0.6s ease-out 0.2s both; }
     .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; animation: fadeInUp 0.6s ease-out 0.3s both; }
     .btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 600; text-decoration: none; transition: var(--transition); cursor: pointer; border: none; font-family: inherit; }
     .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 14px rgba(37,99,235,0.3); }
@@ -213,7 +214,10 @@
   <!-- Hero -->
   <section class="hero" id="home">
     <div class="hero-video" aria-hidden="true">
-      <video autoplay muted loop playsinline preload="auto">
+      <video muted playsinline preload="auto" autoplay>
+        <source src="clouds.mp4" type="video/mp4">
+      </video>
+      <video muted playsinline preload="auto">
         <source src="clouds.mp4" type="video/mp4">
       </video>
     </div>
@@ -478,6 +482,33 @@
       });
       resize();
       if (!reduceMotion) draw();
+    })();
+
+    // ===== Seamless cloud loop: two copies of the video crossfade near the end =====
+    (function () {
+      const vids = Array.from(document.querySelectorAll('.hero-video video'));
+      if (vids.length < 2) return;
+      const FADE = 2; // seconds; keep equal to the CSS opacity transition
+      let active = 0, switching = false;
+      function swap() {
+        if (switching) return;
+        switching = true;
+        const cur = vids[active], next = vids[1 - active];
+        next.currentTime = 0;
+        next.play().catch(() => {});
+        next.style.opacity = 1;
+        cur.style.opacity = 0;
+        setTimeout(() => {
+          cur.pause(); cur.currentTime = 0;
+          active = 1 - active; switching = false;
+        }, FADE * 1000 + 100);
+      }
+      vids.forEach((v, i) => {
+        v.addEventListener('timeupdate', () => {
+          if (i === active && !switching && v.duration && v.duration - v.currentTime <= FADE) swap();
+        });
+        v.addEventListener('ended', () => { if (i === active) swap(); });
+      });
     })();
 
     // ===== Typing effect =====
