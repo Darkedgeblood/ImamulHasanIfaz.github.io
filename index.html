@@ -78,8 +78,7 @@
     .hero-bg { position: absolute; inset: 0; background: radial-gradient(circle at 20% 50%, rgba(37,99,235,0.04) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(37,99,235,0.03) 0%, transparent 50%); pointer-events: none; }
     /* Cloud video: covers only the opening screen and fades out at the bottom, revealing the dot wallpaper */
     .hero-video { position: absolute; inset: 0; z-index: 0; pointer-events: none; -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 100%); mask-image: linear-gradient(to bottom, #000 72%, transparent 100%); }
-    .hero-video video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity 2s linear; }
-    .hero-video video:first-child { opacity: 1; }
+    .hero-video canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
     .hero-video::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.4); } /* keeps dark text readable; raise for brighter clouds */
     .hero-content { max-width: 900px; text-align: center; position: relative; z-index: 1; }
     .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; background: var(--accent-soft); color: var(--accent); border-radius: 100px; font-size: 0.85rem; font-weight: 600; margin-bottom: 24px; border: 1px solid rgba(37,99,235,0.15); animation: fadeInUp 0.6s ease-out; }
@@ -182,7 +181,6 @@
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      .hero-video video { display: none; }
       *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
     }
   </style>
@@ -214,12 +212,7 @@
   <!-- Hero -->
   <section class="hero" id="home">
     <div class="hero-video" aria-hidden="true">
-      <video muted playsinline preload="auto" autoplay>
-        <source src="clouds.mp4" type="video/mp4">
-      </video>
-      <video muted playsinline preload="auto">
-        <source src="clouds.mp4" type="video/mp4">
-      </video>
+      <canvas id="sky"></canvas>
     </div>
     <div class="hero-bg"></div>
     <div class="hero-content">
@@ -484,31 +477,97 @@
       if (!reduceMotion) draw();
     })();
 
-    // ===== Seamless cloud loop: two copies of the video crossfade near the end =====
+    // ===== Procedural cloudy sky (WebGL): endless drifting clouds, no video, so nothing ever loops =====
     (function () {
-      const vids = Array.from(document.querySelectorAll('.hero-video video'));
-      if (vids.length < 2) return;
-      const FADE = 2; // seconds; keep equal to the CSS opacity transition
-      let active = 0, switching = false;
-      function swap() {
-        if (switching) return;
-        switching = true;
-        const cur = vids[active], next = vids[1 - active];
-        next.currentTime = 0;
-        next.play().catch(() => {});
-        next.style.opacity = 1;
-        cur.style.opacity = 0;
-        setTimeout(() => {
-          cur.pause(); cur.currentTime = 0;
-          active = 1 - active; switching = false;
-        }, FADE * 1000 + 100);
+      const c = document.getElementById('sky');
+      const hero = document.getElementById('home');
+      const fallback = () => { c.style.display = 'none'; c.parentElement.style.background = 'linear-gradient(#3f74cf, #a9cdf2)'; };
+      const gl = c.getContext('webgl', { antialias: false, alpha: false });
+      if (!gl) { fallback(); return; }
+
+      const vs = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+      const fs = `
+        #ifdef GL_FRAGMENT_PRECISION_HIGH
+        precision highp float;
+        #else
+        precision mediump float;
+        #endif
+        uniform vec2 r; uniform float t;
+        float h(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
+        float n(vec2 p){
+          vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+          return mix(mix(h(i),h(i+vec2(1.,0.)),f.x), mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x), f.y);
+        }
+        float fbm(vec2 p){
+          float v=0., a=.5;
+          for(int i=0;i<5;i++){ v+=a*n(p); p=mat2(1.6,1.2,-1.2,1.6)*p; a*=.5; }
+          return v;
+        }
+        void main(){
+          vec2 fc=gl_FragCoord.xy;
+          float asp=r.x/r.y;
+          vec2 uv=fc/r.y;
+          float v=fc.y/r.y;
+          vec3 sky=mix(vec3(.64,.79,.96),vec3(.20,.42,.82),smoothstep(0.,1.,v));
+          vec2 p=uv*2.4+vec2(-t*.06,t*.012);                 // steady drift
+          vec2 q=vec2(fbm(p*.7+vec2(0.,t*.02)),fbm(p*.7+vec2(5.2,1.3)-t*.015)); // slow morphing
+          vec2 w=p+1.2*q;
+          float d=fbm(w);
+          float dl=fbm(w+vec2(.07,.09));                      // sample toward the sun for lighting
+          float cover=smoothstep(.45,.78,d)*.97;
+          float shade=clamp(.5+(d-dl)*3.5,0.,1.);
+          vec3 cc=mix(vec3(.55,.64,.80),vec3(1.),shade);
+          vec3 col=mix(sky,cc,cover);
+          float sun=pow(max(0.,1.-length(uv-vec2(asp*.85,.95))),4.);
+          col+=vec3(1.,.96,.82)*sun*.22;
+          gl_FragColor=vec4(col,1.);
+        }`;
+
+      function compile(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; }
+      const pr = gl.createProgram();
+      gl.attachShader(pr, compile(gl.VERTEX_SHADER, vs));
+      gl.attachShader(pr, compile(gl.FRAGMENT_SHADER, fs));
+      gl.linkProgram(pr);
+      if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) { fallback(); return; }
+      gl.useProgram(pr);
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(pr, 'a');
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      const uR = gl.getUniformLocation(pr, 'r'), uT = gl.getUniformLocation(pr, 't');
+
+      const SCALE = 0.5;   // render at half resolution: soft clouds, much lighter on the GPU
+      let t = 40, last = 0, running = false;
+      const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function resize() {
+        c.width = Math.max(2, Math.round(c.clientWidth * SCALE));
+        c.height = Math.max(2, Math.round(c.clientHeight * SCALE));
+        gl.viewport(0, 0, c.width, c.height);
+        render();
       }
-      vids.forEach((v, i) => {
-        v.addEventListener('timeupdate', () => {
-          if (i === active && !switching && v.duration && v.duration - v.currentTime <= FADE) swap();
-        });
-        v.addEventListener('ended', () => { if (i === active) swap(); });
-      });
+      function render() {
+        gl.uniform2f(uR, c.width, c.height);
+        gl.uniform1f(uT, t);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      }
+      function frame(now) {
+        if (!running) return;
+        t += last ? Math.min((now - last) / 1000, 0.05) : 0;
+        last = now;
+        render();
+        requestAnimationFrame(frame);
+      }
+      addEventListener('resize', resize);
+      resize();
+      if (still) return;
+      // only animate while the opening screen is on screen
+      new IntersectionObserver(([e]) => {
+        if (e.isIntersecting && !running) { running = true; last = 0; requestAnimationFrame(frame); }
+        else if (!e.isIntersecting) running = false;
+      }).observe(hero);
     })();
 
     // ===== Typing effect =====
