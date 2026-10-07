@@ -7,7 +7,7 @@
   <title>Ifaz | Portfolio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #ffffff; --bg-soft: #f8fafc; --bg-muted: #f1f5f9;
@@ -40,7 +40,7 @@
       backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
       border-bottom: 1px solid rgba(255,255,255,0.4);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 1px 0 rgba(0,0,0,0.03);
-      transition: var(--transition);
+      transition: background 0.3s, box-shadow 0.3s, border-color 0.3s;
     }
     nav.scrolled {
       background: rgba(255,255,255,0.72);
@@ -74,18 +74,27 @@
     .mobile-menu a:hover { background: rgba(37,99,235,0.08); color: var(--accent); }
 
     /* Hero */
-    .hero { max-width: 100%; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 100px 24px 60px; position: relative; overflow: hidden; }
+    .hero { max-width: 100%; margin: 0; min-height: 100vh; min-height: 100svh; display: flex; align-items: center; justify-content: center; padding: 100px 24px 60px; position: relative; overflow: hidden; }
     .hero-bg { position: absolute; inset: 0; background: radial-gradient(circle at 20% 50%, rgba(37,99,235,0.04) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(37,99,235,0.03) 0%, transparent 50%); pointer-events: none; }
-    /* Cloud video: covers only the opening screen and fades out at the bottom, revealing the dot wallpaper */
-    .hero-video { position: absolute; inset: 0; z-index: 0; pointer-events: none; -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 100%); mask-image: linear-gradient(to bottom, #000 72%, transparent 100%); }
-    .hero-video canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-    .hero-video::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.4); } /* keeps dark text readable; raise for brighter clouds */
-    .hero-content { max-width: 900px; text-align: center; position: relative; z-index: 1; }
+    /* Cloud sky: pre-drawn, seamless cloud images drift sideways using only a GPU transform.
+       No video, no WebGL, no per-frame JavaScript, so it keeps moving on any phone.
+       The sky colour and the clouds fade out at the bottom to reveal the dot wallpaper (no mask needed). */
+    .hero-video { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; contain: paint;
+      background: linear-gradient(to bottom, #3f74cf 0%, #a9cdf2 72%, rgba(169,205,242,0) 100%); }
+    .cloud-layer { position: absolute; top: 0; left: 0; height: 80%; width: calc(var(--tile, 160svh) + 100vw);
+      background-repeat: repeat-x; background-size: var(--tile, 160svh) 100%;
+      will-change: transform; animation: cloud-drift var(--speed, 120s) linear infinite; }
+    .cloud-a { background-image: url('clouds-a.webp'); opacity: 0.95; --speed: 120s; }
+    .cloud-b { background-image: url('clouds-b.webp'); opacity: 0.8; --speed: 75s; }
+    .hero-video.paused .cloud-layer { animation-play-state: paused; }
+    @keyframes cloud-drift { from { transform: translate3d(0,0,0); } to { transform: translate3d(calc(var(--tile, 160svh) * -1), 0, 0); } }
+    .hero-video::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(255,255,255,0.4) 72%, rgba(255,255,255,0) 100%); } /* keeps dark text readable */
+    .hero-content { width: 100%; max-width: 900px; text-align: center; position: relative; z-index: 1; }
     .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; background: var(--accent-soft); color: var(--accent); border-radius: 100px; font-size: 0.85rem; font-weight: 600; margin-bottom: 24px; border: 1px solid rgba(37,99,235,0.15); animation: fadeInUp 0.6s ease-out; }
     .hero-badge::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
     .hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 16px; letter-spacing: -0.02em; animation: fadeInUp 0.6s ease-out 0.1s both; }
     .hero h1 .accent { color: var(--accent); position: relative; }
-    .typing-text { display: inline-block; border-right: 3px solid var(--accent); animation: blink 0.7s step-end infinite; white-space: nowrap; overflow: hidden; min-height: 1.1em; }
+    .typing-text { display: inline-block; max-width: 100%; font-size: min(1em, calc((100vw - 56px) / 11.4)); border-right: 3px solid var(--accent); animation: blink 0.7s step-end infinite; white-space: nowrap; overflow: hidden; min-height: 1.1em; }
     @keyframes blink { 50% { border-color: transparent; } }
     .hero-subtitle { font-size: clamp(1rem, 2.5vw, 1.35rem); color: #1e293b; font-weight: 500; margin: 0 auto 32px; max-width: 600px; animation: fadeInUp 0.6s ease-out 0.2s both; }
     .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; animation: fadeInUp 0.6s ease-out 0.3s both; }
@@ -160,7 +169,7 @@
     footer a:hover { color: var(--accent); }
 
     /* Scroll reveal */
-    .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+    .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
     .reveal.active { opacity: 1; transform: translateY(0); }
 
     /* Responsive */
@@ -179,9 +188,32 @@
       section { padding: 60px 20px; }
       .projects { padding: 60px 20px; }
     }
+    /* Phones & tablets: drop the heavy live-blur (it is recomputed on every scrolled frame) and the sticky hover effects */
+    @media (max-width: 900px), (hover: none) {
+      nav, nav.scrolled, .mobile-menu { background: rgba(255,255,255,0.94); backdrop-filter: none; -webkit-backdrop-filter: none; }
+      .about-meta, .contact-card { background: rgba(255,255,255,0.92); backdrop-filter: none; -webkit-backdrop-filter: none; }
+    }
+    @media (hover: none) {
+      .btn:hover, .project-card:hover, .skill-tag:hover, .social-btn:hover, .about-image img:hover { transform: none; }
+    }
+    @media (max-height: 700px) { .scroll-indicator { display: none; } }
+
+    /* Smooth cursor (mouse devices only; the elements are created by JS) */
+    html.has-cursor, html.has-cursor * { cursor: none !important; }
+    .cursor-dot, .cursor-ring { position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.25s; will-change: transform; }
+    .cursor-dot::before, .cursor-ring::before { content: ''; display: block; border-radius: 50%; transform: translate(-50%, -50%); }
+    .cursor-dot::before { width: 8px; height: 8px; background: var(--accent); transition: transform 0.2s; }
+    .cursor-ring::before { width: 38px; height: 38px; border: 1.5px solid rgba(37,99,235,0.5); background: rgba(37,99,235,0.06); transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s, border-color 0.25s; }
+    .cursor-on .cursor-dot, .cursor-on .cursor-ring { opacity: 1; }
+    .cursor-hover .cursor-ring::before { transform: translate(-50%, -50%) scale(1.7); background: rgba(37,99,235,0.12); border-color: rgba(37,99,235,0.7); }
+    .cursor-hover .cursor-dot::before { transform: translate(-50%, -50%) scale(0.5); }
+    .cursor-down .cursor-ring::before { transform: translate(-50%, -50%) scale(0.8); }
+
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+      /* the clouds keep drifting, just far slower, so the sky never looks frozen */
+      .cloud-layer { animation-duration: calc(var(--speed, 120s) * 4) !important; animation-iteration-count: infinite !important; }
     }
   </style>
 <base target="_blank">
@@ -212,7 +244,8 @@
   <!-- Hero -->
   <section class="hero" id="home">
     <div class="hero-video" aria-hidden="true">
-      <canvas id="sky"></canvas>
+      <div class="cloud-layer cloud-b"></div>
+      <div class="cloud-layer cloud-a"></div>
     </div>
     <div class="hero-bg"></div>
     <div class="hero-content">
@@ -416,16 +449,22 @@
       const canvas = document.getElementById('bg');
       const ctx = canvas.getContext('2d');
       const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const LINK = 130, COLOR = '37,99,235';
-      let w, h, dots = [], raf = null;
+      const coarse = matchMedia('(hover: none), (pointer: coarse)').matches;   // phones & tablets
+      const LINK = coarse ? 110 : 130, LINK2 = LINK * LINK, COLOR = '37,99,235';
+      const FRAME_MS = coarse ? 1000 / 30 : 0;                                 // 30 fps cap on touch devices
+      let w = 0, h = 0, dots = [], raf = 0, lastDraw = 0, scrolling = false, scrollTimer = 0;
       const mouse = { x: -9999, y: -9999 };
 
       function resize() {
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        // Phone browsers fire "resize" whenever the address bar slides away. Ignore that, otherwise the canvas
+        // is rebuilt and the dots jump in the middle of scrolling.
+        if (w && coarse && innerWidth === w && Math.abs(innerHeight - h) < 160) return;
+        const dpr = coarse ? 1 : Math.min(window.devicePixelRatio || 1, 2);
         w = innerWidth; h = innerHeight;
         canvas.width = w * dpr; canvas.height = h * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const count = Math.max(30, Math.min(90, Math.round(w * h / 16000)));
+        const count = coarse ? Math.max(16, Math.min(32, Math.round(w * h / 20000)))
+                             : Math.max(30, Math.min(90, Math.round(w * h / 16000)));
         dots = Array.from({ length: count }, () => ({
           x: Math.random() * w, y: Math.random() * h,
           vx: (Math.random() - 0.5) * 0.45, vy: (Math.random() - 0.5) * 0.45,
@@ -436,6 +475,7 @@
 
       function draw() {
         ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = 'rgba(' + COLOR + ',0.45)';
         for (const d of dots) {
           if (!reduceMotion) {
             d.x += d.vx; d.y += d.vy;
@@ -444,130 +484,100 @@
           }
           ctx.beginPath();
           ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(' + COLOR + ',0.45)';
           ctx.fill();
         }
+        const hasMouse = mouse.x > -9000;
         for (let i = 0; i < dots.length; i++) {
+          const a = dots[i];
           for (let j = i + 1; j < dots.length; j++) {
-            const dist = Math.hypot(dots[i].x - dots[j].x, dots[i].y - dots[j].y);
-            if (dist < LINK) {
-              ctx.strokeStyle = 'rgba(' + COLOR + ',' + (0.18 * (1 - dist / LINK)) + ')';
-              ctx.beginPath(); ctx.moveTo(dots[i].x, dots[i].y); ctx.lineTo(dots[j].x, dots[j].y); ctx.stroke();
+            const b = dots[j], dx = a.x - b.x, dy = a.y - b.y, d2 = dx * dx + dy * dy;
+            if (d2 < LINK2) {
+              ctx.strokeStyle = 'rgba(' + COLOR + ',' + (0.18 * (1 - Math.sqrt(d2) / LINK)) + ')';
+              ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
             }
           }
-          const md = Math.hypot(dots[i].x - mouse.x, dots[i].y - mouse.y);
-          if (md < 170) {
-            ctx.strokeStyle = 'rgba(' + COLOR + ',' + (0.3 * (1 - md / 170)) + ')';
-            ctx.beginPath(); ctx.moveTo(dots[i].x, dots[i].y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+          if (hasMouse) {
+            const mx = a.x - mouse.x, my = a.y - mouse.y, m2 = mx * mx + my * my;
+            if (m2 < 28900) {   // 170px
+              ctx.strokeStyle = 'rgba(' + COLOR + ',' + (0.3 * (1 - Math.sqrt(m2) / 170)) + ')';
+              ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+            }
           }
         }
-        if (!reduceMotion) raf = requestAnimationFrame(draw);
       }
 
+      function frame(now) {
+        raf = requestAnimationFrame(frame);
+        if (coarse && scrolling) return;                       // freeze the wallpaper while the finger is scrolling
+        if (FRAME_MS && now - lastDraw < FRAME_MS - 1) return;
+        lastDraw = now;
+        draw();
+      }
+      function start() { if (!raf && !reduceMotion) raf = requestAnimationFrame(frame); }
+      function stop() { cancelAnimationFrame(raf); raf = 0; }
+
       addEventListener('resize', resize);
-      addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+      addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
       addEventListener('mouseout', () => { mouse.x = mouse.y = -9999; });
+      if (coarse) addEventListener('scroll', () => {
+        scrolling = true; clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => { scrolling = false; }, 140);
+      }, { passive: true });
       // Pause when the tab is hidden to save battery
-      document.addEventListener('visibilitychange', () => {
-        if (reduceMotion) return;
-        if (document.hidden) { cancelAnimationFrame(raf); }
-        else { raf = requestAnimationFrame(draw); }
-      });
+      document.addEventListener('visibilitychange', () => { document.hidden ? stop() : start(); });
       resize();
-      if (!reduceMotion) draw();
+      start();
     })();
 
-    // ===== Procedural cloudy sky (WebGL): endless drifting clouds, no video, so nothing ever loops =====
+    // ===== Clouds: size the seamless tile to the sky height, and pause the drift while the opening screen is off-screen =====
     (function () {
-      const c = document.getElementById('sky');
-      const hero = document.getElementById('home');
-      const fallback = () => { c.style.display = 'none'; c.parentElement.style.background = 'linear-gradient(#3f74cf, #a9cdf2)'; };
-      const gl = c.getContext('webgl', { antialias: false, alpha: false });
-      if (!gl) { fallback(); return; }
-
-      const vs = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
-      const fs = `
-        #ifdef GL_FRAGMENT_PRECISION_HIGH
-        precision highp float;
-        #else
-        precision mediump float;
-        #endif
-        uniform vec2 r; uniform float t;
-        float h(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
-        float n(vec2 p){
-          vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
-          return mix(mix(h(i),h(i+vec2(1.,0.)),f.x), mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x), f.y);
-        }
-        float fbm(vec2 p){
-          float v=0., a=.5;
-          for(int i=0;i<5;i++){ v+=a*n(p); p=mat2(1.6,1.2,-1.2,1.6)*p; a*=.5; }
-          return v;
-        }
-        void main(){
-          vec2 fc=gl_FragCoord.xy;
-          float asp=r.x/r.y;
-          vec2 uv=fc/r.y;
-          float v=fc.y/r.y;
-          vec3 sky=mix(vec3(.64,.79,.96),vec3(.20,.42,.82),smoothstep(0.,1.,v));
-          vec2 p=uv*2.4+vec2(-t*.06,t*.012);                 // steady drift
-          vec2 q=vec2(fbm(p*.7+vec2(0.,t*.02)),fbm(p*.7+vec2(5.2,1.3)-t*.015)); // slow morphing
-          vec2 w=p+1.2*q;
-          float d=fbm(w);
-          float dl=fbm(w+vec2(.07,.09));                      // sample toward the sun for lighting
-          float cover=smoothstep(.45,.78,d)*.97;
-          float shade=clamp(.5+(d-dl)*3.5,0.,1.);
-          vec3 cc=mix(vec3(.55,.64,.80),vec3(1.),shade);
-          vec3 col=mix(sky,cc,cover);
-          float sun=pow(max(0.,1.-length(uv-vec2(asp*.85,.95))),4.);
-          col+=vec3(1.,.96,.82)*sun*.22;
-          gl_FragColor=vec4(col,1.);
-        }`;
-
-      function compile(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; }
-      const pr = gl.createProgram();
-      gl.attachShader(pr, compile(gl.VERTEX_SHADER, vs));
-      gl.attachShader(pr, compile(gl.FRAGMENT_SHADER, fs));
-      gl.linkProgram(pr);
-      if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) { fallback(); return; }
-      gl.useProgram(pr);
-
-      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-      const loc = gl.getAttribLocation(pr, 'a');
-      gl.enableVertexAttribArray(loc);
-      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      const uR = gl.getUniformLocation(pr, 'r'), uT = gl.getUniformLocation(pr, 't');
-
-      const SCALE = 0.5;   // render at half resolution: soft clouds, much lighter on the GPU
-      let t = 40, last = 0, running = false;
-      const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      function resize() {
-        c.width = Math.max(2, Math.round(c.clientWidth * SCALE));
-        c.height = Math.max(2, Math.round(c.clientHeight * SCALE));
-        gl.viewport(0, 0, c.width, c.height);
-        render();
+      const sky = document.querySelector('.hero-video');
+      const layer = sky.querySelector('.cloud-layer');
+      let lastH = 0;
+      function fit() {
+        const hgt = layer.clientHeight;
+        if (hgt && hgt !== lastH) { lastH = hgt; sky.style.setProperty('--tile', (hgt * 2) + 'px'); }   // cloud images are 2:1, so one tile = 2 x height
       }
-      function render() {
-        gl.uniform2f(uR, c.width, c.height);
-        gl.uniform1f(uT, t);
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      fit();
+      addEventListener('load', fit);
+      if (window.ResizeObserver) new ResizeObserver(fit).observe(layer); else addEventListener('resize', fit);
+      new IntersectionObserver(([e]) => sky.classList.toggle('paused', !e.isIntersecting)).observe(sky);
+    })();
+
+    // ===== Smooth cursor: a dot that tracks the pointer and a softly trailing ring (mouse devices only) =====
+    (function () {
+      if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const root = document.documentElement;
+      const dot = document.createElement('div'), ring = document.createElement('div');
+      dot.className = 'cursor-dot'; ring.className = 'cursor-ring';
+      dot.setAttribute('aria-hidden', 'true'); ring.setAttribute('aria-hidden', 'true');
+      document.body.append(ring, dot);
+
+      let mx = 0, my = 0, rx = 0, ry = 0, raf = 0, last = 0, seen = false, visible = false;
+      const TAU = 85;   // ms: how softly the ring follows (bigger = lazier)
+
+      function tick(now) {
+        const dt = Math.min(now - (last || now), 64); last = now;
+        const k = reduce ? 1 : 1 - Math.exp(-dt / TAU);     // frame-rate independent easing
+        rx += (mx - rx) * k; ry += (my - ry) * k;
+        ring.style.transform = 'translate3d(' + rx.toFixed(2) + 'px,' + ry.toFixed(2) + 'px,0)';
+        if (Math.abs(mx - rx) + Math.abs(my - ry) > 0.1) raf = requestAnimationFrame(tick);
+        else { raf = 0; last = 0; }                          // settled: stop the loop until the mouse moves again
       }
-      function frame(now) {
-        if (!running) return;
-        t += last ? Math.min((now - last) / 1000, 0.05) : 0;
-        last = now;
-        render();
-        requestAnimationFrame(frame);
-      }
-      addEventListener('resize', resize);
-      resize();
-      if (still) return;
-      // only animate while the opening screen is on screen
-      new IntersectionObserver(([e]) => {
-        if (e.isIntersecting && !running) { running = true; last = 0; requestAnimationFrame(frame); }
-        else if (!e.isIntersecting) running = false;
-      }).observe(hero);
+      addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        dot.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0)';
+        if (!seen) { seen = true; rx = mx; ry = my; root.classList.add('has-cursor'); }
+        if (!visible) { visible = true; rx = mx; ry = my; root.classList.add('cursor-on'); }   // reappear exactly at the pointer
+        if (!raf) raf = requestAnimationFrame(tick);
+      }, { passive: true });
+      document.addEventListener('mouseout', e => { if (!e.relatedTarget) { visible = false; root.classList.remove('cursor-on'); } });
+      addEventListener('mousedown', () => root.classList.add('cursor-down'));
+      addEventListener('mouseup', () => root.classList.remove('cursor-down'));
+      document.addEventListener('mouseover', e => {
+        root.classList.toggle('cursor-hover', !!(e.target.closest && e.target.closest('a, button, .project-card, .skill-tag')));
+      }, { passive: true });
     })();
 
     // ===== Typing effect =====
@@ -597,11 +607,7 @@
     }
     setTimeout(type, 1000);
 
-    // ===== Navbar scroll effect =====
-    const navbar = document.getElementById('navbar');
-    addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 50);
-    });
+    // (navbar + active link are handled together in the scroll block below)
 
     // ===== Mobile menu =====
     const hamburger = document.getElementById('hamburger');
@@ -617,18 +623,23 @@
       });
     });
 
-    // ===== Active nav link on scroll =====
+    // ===== Navbar style + active nav link on scroll (one passive, rAF-throttled handler; section offsets are cached) =====
+    const navbar = document.getElementById('navbar');
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('.nav-link');
-    addEventListener('scroll', () => {
+    let offsets = [], ticking = false;
+    function measure() { offsets = Array.from(sections, s => ({ id: s.id, top: s.offsetTop })); }
+    function onScroll() {
+      ticking = false;
+      navbar.classList.toggle('scrolled', scrollY > 50);
       let current = '';
-      sections.forEach(section => {
-        if (scrollY >= section.offsetTop - 200) current = section.getAttribute('id');
-      });
-      navLinks.forEach(link => {
-        link.classList.toggle('active', link.getAttribute('href') === '#' + current);
-      });
-    });
+      for (const o of offsets) if (scrollY >= o.top - 200) current = o.id;
+      navLinks.forEach(link => link.classList.toggle('active', link.getAttribute('href') === '#' + current));
+    }
+    addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+    addEventListener('resize', () => { measure(); onScroll(); });
+    addEventListener('load', () => { measure(); onScroll(); });
+    measure(); onScroll();
 
     // ===== Scroll reveal =====
     const revealObserver = new IntersectionObserver((entries) => {
