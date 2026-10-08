@@ -216,6 +216,57 @@
       /* the clouds keep drifting, just far slower, so the sky never looks frozen */
       .cloud-layer { animation-duration: calc(var(--speed, 120s) * 4) !important; animation-iteration-count: infinite !important; }
     }
+/* Dark and Light mode*/
+/* --- Floating Dark Mode Button --- */
+.theme-toggle {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    color: #1a1a1a;
+    border: none;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle svg {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s ease;
+}
+
+.moon-icon { opacity: 1; transform: rotate(0) scale(1); }
+.sun-icon { opacity: 0; transform: rotate(-90deg) scale(0); }
+
+/* --- Dark Mode State --- */
+body.dark-mode .theme-toggle {
+    background-color: #242424;
+    color: #fBBF24;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+body.dark-mode .moon-icon { opacity: 0; transform: rotate(90deg) scale(0); }
+body.dark-mode .sun-icon { opacity: 1; transform: rotate(0) scale(1); }
+
+/* Dark Mode Background & Text */
+body.dark-mode {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
   </style>
 <base target="_blank">
 </head>
@@ -681,6 +732,27 @@
         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
     </svg>
 </button>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    });
+</script>
 
 </body>
 </html>
