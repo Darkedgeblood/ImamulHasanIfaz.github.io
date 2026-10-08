@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Deep Navy to Royal Blue Gradient -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A1128" />
+      <stop offset="100%" stop-color="#1D3A8F" />
+    </linearGradient>
+    
+    <!-- Gold Accent Gradient -->
+    <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+    
+    <!-- Subtle Drop Shadow -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Background Squircle -->
+  <rect x="24" y="24" width="464" height="464" rx="120" fill="url(#bg-grad)" />
+
+  <!-- Initials: I H I -->
+  <g filter="url(#shadow)">
+    <!-- First 'I' -->
+    <rect x="96" y="160" width="48" height="192" rx="12" fill="#FFFFFF" />
+
+    <!-- 'H' Left Pillar -->
+    <rect x="184" y="160" width="48" height="192" rx="12" fill="#FFFFFF" />
+
+    <!-- 'H' Right Pillar -->
+    <rect x="280" y="160" width="48" height="192" rx="12" fill="#FFFFFF" />
+
+    <!-- 'H' Crossbar -->
+    <rect x="208" y="236" width="96" height="40" rx="8" fill="url(#gold-grad)" />
+
+    <!-- Second 'I' -->
+    <rect x="368" y="160" width="48" height="192" rx="12" fill="#FFFFFF" />
+  </g>
+</svg>
