@@ -94,7 +94,7 @@
     .hero-video { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; contain: paint; }
     .sky { position: absolute; inset: 0; transition: opacity 0.4s ease; }
     .sky-day { background: linear-gradient(to bottom, #3f74cf 0%, #a9cdf2 72%, rgba(169,205,242,0) 100%); }
-    .sky-night { background: linear-gradient(to bottom, #000 0%, #050505 72%, rgba(0,0,0,0) 100%); opacity: 0; }
+    .sky-night { background: linear-gradient(to bottom, rgba(2,6,18,0.62) 0%, rgba(2,6,18,0.4) 60%, rgba(0,0,0,0) 100%); opacity: 0; }  /* see-through so the fixed stars show in the sky */
     .cloud-layer { position: absolute; top: 0; left: 0; height: 80%; width: calc(var(--tile, 160svh) + 100vw);
       background-repeat: repeat-x; background-size: var(--tile, 160svh) 100%;
       will-change: transform; animation: cloud-drift var(--speed, 120s) linear infinite; }
@@ -241,7 +241,7 @@
       color-scheme: dark;
     }
     /* pure-black page layer that fades in over the light gradient (gradients can't be transitioned directly) */
-    html::before { content: ''; position: fixed; inset: 0; z-index: -2; background: #000; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+    html::before { content: ''; position: fixed; inset: 0; z-index: -2; background: radial-gradient(ellipse at 72% 28%, #0a1226 0%, #03060e 52%, #000 100%); opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
     html[data-theme="dark"]::before { opacity: 1; }
 
     /* sky: day -> night, clouds stay and drift, just dimmer */
@@ -250,8 +250,16 @@
     html[data-theme="dark"] .sky-day { opacity: 0; }
     html[data-theme="dark"] .sky-night { opacity: 1; }
     html[data-theme="dark"] .hero-video::after { opacity: 0; }
-    html[data-theme="dark"] .cloud-a { opacity: 0.32; }
-    html[data-theme="dark"] .cloud-b { opacity: 0.22; }
+    html[data-theme="dark"] .cloud-a { background-image: url('clouds-a-night.webp'); opacity: 0.8; }
+    html[data-theme="dark"] .cloud-b { background-image: url('clouds-b-night.webp'); opacity: 0.55; }
+
+    /* stars: drawn once on canvases (see script), two layers twinkle with a cheap CSS opacity animation */
+    #starfield { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0; transition: opacity 0.6s ease; }
+    html[data-theme="dark"] #starfield { opacity: 1; }
+    #starfield canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #starfield .st-b { animation: twinkle 5s ease-in-out infinite; }
+    #starfield .st-c { animation: twinkle 8s ease-in-out -3s infinite; }
+    @keyframes twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
 
     html[data-theme="dark"] nav { background: rgba(0,0,0,0.6); border-bottom-color: rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 1px 0 rgba(0,0,0,0.4); }
     html[data-theme="dark"] nav.scrolled { background: rgba(0,0,0,0.8); border-bottom-color: rgba(255,255,255,0.1); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 24px rgba(0,0,0,0.5); }
@@ -264,7 +272,7 @@
     html[data-theme="dark"] .btn-primary:hover { box-shadow: 0 6px 20px rgba(96,165,250,0.35); }
     html[data-theme="dark"] ::selection { color: #000; }
     html[data-theme="dark"] .about-meta, html[data-theme="dark"] .contact-card { background: rgba(10,10,10,0.7); }
-    html[data-theme="dark"] .projects { background: rgba(0,0,0,0.5); }
+    html[data-theme="dark"] .projects { background: rgba(0,0,0,0.28); }
     html[data-theme="dark"] .project-card { background: #0a0a0a; }
     html[data-theme="dark"] .project-image { background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%); }
     html[data-theme="dark"] .project-image::after { background: linear-gradient(to top, rgba(0,0,0,0.25), transparent); }
@@ -319,6 +327,7 @@
   </button>
 
   <!-- Live wallpaper -->
+  <div id="starfield" aria-hidden="true"><canvas class="st st-a"></canvas><canvas class="st st-b"></canvas><canvas class="st st-c"></canvas></div>
   <canvas id="bg" aria-hidden="true"></canvas>
 
   <!-- Navigation -->
@@ -750,6 +759,59 @@
       entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
     document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ===== Stars (dark mode): painted once when dark mode is first used; twinkle is a CSS opacity animation =====
+    (function () {
+      const box = document.getElementById('starfield');
+      const canvases = Array.from(box.querySelectorAll('canvas'));
+      const rnd = (a, b) => a + Math.random() * (b - a);
+      let painted = false, lw = 0, lh = 0;
+
+      function paint() {
+        painted = true;
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        const W = lw = window.innerWidth, H = lh = window.innerHeight;
+        const ctx = canvases.map(c => {
+          c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+          const x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); return x;
+        });
+        const n = Math.min(900, Math.round(W * H / 2600));
+        for (let i = 0; i < n; i++) {
+          const g = ctx[i % 2 ? (i % 4 === 1 ? 1 : 2) : 0];                // half steady, half twinkling
+          const r = Math.random() < 0.9 ? rnd(0.35, 0.95) : rnd(0.95, 1.5);
+          const a = rnd(0.35, 0.95), t = Math.random();
+          g.fillStyle = t < 0.12 ? `rgba(255,236,200,${a})` : t < 0.4 ? `rgba(190,210,255,${a})` : `rgba(255,255,255,${a})`;
+          g.beginPath(); g.arc(Math.random() * W, Math.random() * H, r, 0, 6.2832); g.fill();
+        }
+        // a few bright golden stars with a soft glow
+        const bright = Math.max(5, Math.round(W * H / 90000));
+        for (let i = 0; i < bright; i++) {
+          const g = ctx[1 + (i % 2)], x = Math.random() * W, y = Math.random() * H, R = rnd(9, 16);
+          const glow = g.createRadialGradient(x, y, 0, x, y, R);
+          glow.addColorStop(0, 'rgba(255,228,165,0.9)'); glow.addColorStop(0.25, 'rgba(255,220,150,0.28)'); glow.addColorStop(1, 'rgba(255,220,150,0)');
+          g.fillStyle = glow; g.beginPath(); g.arc(x, y, R, 0, 6.2832); g.fill();
+          g.fillStyle = 'rgba(255,248,230,1)'; g.beginPath(); g.arc(x, y, 1.4, 0, 6.2832); g.fill();
+          if (i % 3 === 0) {                                                // little sparkle on some of them
+            g.strokeStyle = 'rgba(255,236,190,0.7)'; g.lineWidth = 0.8; g.beginPath();
+            g.moveTo(x - R * 0.9, y); g.lineTo(x + R * 0.9, y); g.moveTo(x, y - R * 0.9); g.lineTo(x, y + R * 0.9); g.stroke();
+          }
+        }
+      }
+
+      const root = document.documentElement;
+      const ensure = () => { if (!painted && root.getAttribute('data-theme') === 'dark') paint(); };
+      ensure();
+      new MutationObserver(ensure).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+
+      let t;
+      window.addEventListener('resize', () => {
+        clearTimeout(t);
+        t = setTimeout(() => { if (painted && (window.innerWidth !== lw || Math.abs(window.innerHeight - lh) > 150)) paint(); }, 200);
+      });
+
+      // warm the night cloud images so the first switch to dark doesn't flash
+      (window.requestIdleCallback || (f => setTimeout(f, 1500)))(() => { new Image().src = 'clouds-a-night.webp'; new Image().src = 'clouds-b-night.webp'; });
+    })();
 
     // ===== Theme toggle =====
     (function () {
