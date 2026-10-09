@@ -2,6 +2,17 @@
 <html lang="en">
 <head>
   <meta name="robots" content="noindex, nofollow">
+  <script>
+    (function () {
+      var theme = 'light';
+      try {
+        var saved = localStorage.getItem('theme');
+        if (saved === 'dark' || saved === 'light') theme = saved;
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
+      } catch (e) {}
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ifaz | Portfolio</title>
@@ -80,8 +91,10 @@
     /* Cloud sky: pre-drawn, seamless cloud images drift sideways using only a GPU transform.
        No video, no WebGL, no per-frame JavaScript, so it keeps moving on any phone.
        The sky colour and the clouds fade out at the bottom to reveal the dot wallpaper (no mask needed). */
-    .hero-video { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; contain: paint;
-      background: linear-gradient(to bottom, #3f74cf 0%, #a9cdf2 72%, rgba(169,205,242,0) 100%); }
+    .hero-video { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; contain: paint; }
+    .sky { position: absolute; inset: 0; transition: opacity 0.4s ease; }
+    .sky-day { background: linear-gradient(to bottom, #3f74cf 0%, #a9cdf2 72%, rgba(169,205,242,0) 100%); }
+    .sky-night { background: linear-gradient(to bottom, #000 0%, #050505 72%, rgba(0,0,0,0) 100%); opacity: 0; }
     .cloud-layer { position: absolute; top: 0; left: 0; height: 80%; width: calc(var(--tile, 160svh) + 100vw);
       background-repeat: repeat-x; background-size: var(--tile, 160svh) 100%;
       will-change: transform; animation: cloud-drift var(--speed, 120s) linear infinite; }
@@ -216,61 +229,94 @@
       /* the clouds keep drifting, just far slower, so the sky never looks frozen */
       .cloud-layer { animation-duration: calc(var(--speed, 120s) * 4) !important; animation-iteration-count: infinite !important; }
     }
-/* Dark and Light mode*/
-/* --- Floating Dark Mode Button --- */
-.theme-toggle {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    background-color: #ffffff;
-    color: #1a1a1a;
-    border: none;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-}
 
-.theme-toggle:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
-}
+    /* ===== Dark theme (AMOLED) ===== */
+    html[data-theme="dark"] {
+      --bg: #000000; --bg-soft: #0a0a0a; --bg-muted: #121212;
+      --text: #f5f5f5; --text-secondary: #a3a3a3; --text-muted: #6b6b6b;
+      --accent: #60a5fa; --accent-soft: rgba(96,165,250,0.12); --accent-hover: #93c5fd;
+      --border: #1f1f1f;
+      --shadow: 0 1px 3px rgba(0,0,0,0.4);
+      --shadow-lg: 0 10px 40px rgba(0,0,0,0.6);
+      color-scheme: dark;
+    }
+    /* pure-black page layer that fades in over the light gradient (gradients can't be transitioned directly) */
+    html::before { content: ''; position: fixed; inset: 0; z-index: -2; background: #000; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+    html[data-theme="dark"]::before { opacity: 1; }
 
-.theme-toggle svg {
-    position: absolute;
-    width: 24px;
-    height: 24px;
-    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s ease;
-}
+    /* sky: day -> night, clouds stay and drift, just dimmer */
+    .cloud-layer { transition: opacity 0.4s ease; }
+    .hero-video::after { transition: opacity 0.4s ease; }
+    html[data-theme="dark"] .sky-day { opacity: 0; }
+    html[data-theme="dark"] .sky-night { opacity: 1; }
+    html[data-theme="dark"] .hero-video::after { opacity: 0; }
+    html[data-theme="dark"] .cloud-a { opacity: 0.32; }
+    html[data-theme="dark"] .cloud-b { opacity: 0.22; }
 
-.moon-icon { opacity: 1; transform: rotate(0) scale(1); }
-.sun-icon { opacity: 0; transform: rotate(-90deg) scale(0); }
+    html[data-theme="dark"] nav { background: rgba(0,0,0,0.6); border-bottom-color: rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 1px 0 rgba(0,0,0,0.4); }
+    html[data-theme="dark"] nav.scrolled { background: rgba(0,0,0,0.8); border-bottom-color: rgba(255,255,255,0.1); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 24px rgba(0,0,0,0.5); }
+    html[data-theme="dark"] .mobile-menu { background: rgba(0,0,0,0.92); border-bottom-color: rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 12px 40px rgba(0,0,0,0.6); }
+    html[data-theme="dark"] .nav-links a:hover, html[data-theme="dark"] .nav-links a.active, html[data-theme="dark"] .mobile-menu a:hover { background: rgba(96,165,250,0.12); }
+    html[data-theme="dark"] .hero-bg { background: radial-gradient(circle at 20% 50%, rgba(96,165,250,0.05) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(96,165,250,0.04) 0%, transparent 50%); }
+    html[data-theme="dark"] .hero-subtitle { color: #d4d4d4; }
+    html[data-theme="dark"] .hero-badge { border-color: rgba(96,165,250,0.25); }
+    html[data-theme="dark"] .btn-primary { color: #000; box-shadow: 0 4px 14px rgba(96,165,250,0.25); }
+    html[data-theme="dark"] .btn-primary:hover { box-shadow: 0 6px 20px rgba(96,165,250,0.35); }
+    html[data-theme="dark"] ::selection { color: #000; }
+    html[data-theme="dark"] .about-meta, html[data-theme="dark"] .contact-card { background: rgba(10,10,10,0.7); }
+    html[data-theme="dark"] .projects { background: rgba(0,0,0,0.5); }
+    html[data-theme="dark"] .project-card { background: #0a0a0a; }
+    html[data-theme="dark"] .project-image { background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%); }
+    html[data-theme="dark"] .project-image::after { background: linear-gradient(to top, rgba(0,0,0,0.25), transparent); }
+    html[data-theme="dark"] .social-btn:hover { box-shadow: 0 8px 24px rgba(96,165,250,0.2); }
+    html[data-theme="dark"] .cursor-ring::before { border-color: rgba(96,165,250,0.55); background: rgba(96,165,250,0.08); }
+    html[data-theme="dark"] .cursor-hover .cursor-ring::before { background: rgba(96,165,250,0.14); border-color: rgba(96,165,250,0.8); }
+    @media (max-width: 900px), (hover: none) {
+      html[data-theme="dark"] nav, html[data-theme="dark"] nav.scrolled, html[data-theme="dark"] .mobile-menu { background: rgba(0,0,0,0.94); }
+      html[data-theme="dark"] .about-meta, html[data-theme="dark"] .contact-card { background: rgba(10,10,10,0.92); }
+    }
 
-/* --- Dark Mode State --- */
-body.dark-mode .theme-toggle {
-    background-color: #242424;
-    color: #fBBF24;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-}
-body.dark-mode .moon-icon { opacity: 0; transform: rotate(90deg) scale(0); }
-body.dark-mode .sun-icon { opacity: 1; transform: rotate(0) scale(1); }
+    /* smooth cross-fade of every colour while the theme flips (class is added by JS for ~0.5s only) */
+    @media (prefers-reduced-motion: no-preference) {
+      html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
+        transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease, fill 0.4s ease, stroke 0.4s ease !important;
+      }
+      html.theme-anim .theme-toggle svg { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease !important; }
+      html.theme-anim .theme-toggle { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease, background-color 0.4s ease, border-color 0.4s ease !important; }
+    }
 
-/* Dark Mode Background & Text */
-body.dark-mode {
-    background-color: #121212 !important;
-    color: #e0e0e0 !important;
-}
-
+    /* Theme toggle: floating button, bottom-right */
+    .theme-toggle {
+      position: fixed; right: 24px; bottom: 24px; z-index: 1100;
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--bg); color: var(--text);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      padding: 0; overflow: hidden;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15), 0 14px 36px rgba(0,0,0,0.12);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, background-color 0.4s ease, border-color 0.4s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .theme-toggle:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(0,0,0,0.2), 0 20px 44px rgba(0,0,0,0.15); }
+    .theme-toggle:active { transform: scale(0.93); }
+    .theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    html[data-theme="dark"] .theme-toggle { background: #0f0f0f; border-color: #2a2a2a; box-shadow: 0 6px 16px rgba(0,0,0,0.6), 0 14px 36px rgba(0,0,0,0.6); }
+    .theme-toggle svg { position: absolute; width: 24px; height: 24px; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease; }
+    .theme-toggle .icon-sun { color: #f59e0b; opacity: 1; transform: rotate(0deg) scale(1); }
+    .theme-toggle .icon-moon { color: #e5e5e5; opacity: 0; transform: rotate(-90deg) scale(0.3); }
+    html[data-theme="dark"] .theme-toggle .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.3); }
+    html[data-theme="dark"] .theme-toggle .icon-moon { opacity: 1; transform: rotate(0deg) scale(1); }
+    @media (max-width: 480px) { .theme-toggle { right: 16px; bottom: 16px; width: 52px; height: 52px; } }
+    @media (hover: none) { .theme-toggle:hover { transform: none; } }
   </style>
 <base target="_blank">
 </head>
 <body>
+
+  <!-- Theme toggle -->
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode" title="Toggle theme">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+  </button>
 
   <!-- Live wallpaper -->
   <canvas id="bg" aria-hidden="true"></canvas>
@@ -296,6 +342,8 @@ body.dark-mode {
   <!-- Hero -->
   <section class="hero" id="home">
     <div class="hero-video" aria-hidden="true">
+      <div class="sky sky-day"></div>
+      <div class="sky sky-night"></div>
       <div class="cloud-layer cloud-b"></div>
       <div class="cloud-layer cloud-a"></div>
     </div>
@@ -502,7 +550,8 @@ body.dark-mode {
       const ctx = canvas.getContext('2d');
       const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
       const coarse = matchMedia('(hover: none), (pointer: coarse)').matches;   // phones & tablets
-      const LINK = coarse ? 110 : 130, LINK2 = LINK * LINK, COLOR = '37,99,235';
+      const LINK = coarse ? 110 : 130, LINK2 = LINK * LINK;
+      let COLOR = '37,99,235';
       const FRAME_MS = coarse ? 1000 / 30 : 0;                                 // 30 fps cap on touch devices
       let w = 0, h = 0, dots = [], raf = 0, lastDraw = 0, scrolling = false, scrollTimer = 0;
       const mouse = { x: -9999, y: -9999 };
@@ -526,6 +575,7 @@ body.dark-mode {
       }
 
       function draw() {
+        COLOR = document.documentElement.getAttribute('data-theme') === 'dark' ? '96,165,250' : '37,99,235';
         ctx.clearRect(0, 0, w, h);
         ctx.fillStyle = 'rgba(' + COLOR + ',0.45)';
         for (const d of dots) {
@@ -579,6 +629,8 @@ body.dark-mode {
       document.addEventListener('visibilitychange', () => { document.hidden ? stop() : start(); });
       resize();
       start();
+      // repaint once on theme change when the wallpaper is static (reduced motion)
+      new MutationObserver(() => { if (reduceMotion) draw(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     })();
 
     // ===== Clouds: size the seamless tile to the sky height, and pause the drift while the opening screen is off-screen =====
@@ -699,6 +751,24 @@ body.dark-mode {
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
     document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
+    // ===== Theme toggle =====
+    (function () {
+      const btn = document.getElementById('themeToggle');
+      const root = document.documentElement;
+      let animTimer = 0;
+      function label() { btn.setAttribute('aria-label', root.getAttribute('data-theme') === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'); }
+      label();
+      btn.addEventListener('click', () => {
+        const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        root.classList.add('theme-anim');
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+        label();
+        clearTimeout(animTimer);
+        animTimer = setTimeout(() => root.classList.remove('theme-anim'), 550);
+      });
+    })();
+
     // ===== Footer year =====
     document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -713,46 +783,6 @@ body.dark-mode {
       });
     });
   </script>
-  <!-- Floating Dark Mode Toggle -->
-<button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
-    <!-- Moon Icon (Visible in Light Mode) -->
-    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-    </svg>
-    <!-- Sun Icon (Visible in Dark Mode) -->
-    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="5"></circle>
-        <line x1="12" y1="1" x2="12" y2="3"></line>
-        <line x1="12" y1="21" x2="12" y2="23"></line>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-        <line x1="1" y1="12" x2="3" y2="12"></line>
-        <line x1="21" y1="12" x2="23" y2="12"></line>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-    </svg>
-</button>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            body.classList.add('dark-mode');
-        }
-
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            if (body.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark');
-            } else {
-                localStorage.setItem('theme', 'light');
-            }
-        });
-    });
-</script>
 
 </body>
 </html>
