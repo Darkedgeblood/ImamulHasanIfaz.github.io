@@ -94,7 +94,7 @@
     .hero-video { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; contain: paint; }
     .sky { position: absolute; inset: 0; transition: opacity 0.4s ease; }
     .sky-day { background: linear-gradient(to bottom, #3f74cf 0%, #a9cdf2 72%, rgba(169,205,242,0) 100%); }
-    .sky-night { background: linear-gradient(to bottom, rgba(2,6,18,0.62) 0%, rgba(2,6,18,0.4) 60%, rgba(0,0,0,0) 100%); opacity: 0; }  /* see-through so the fixed stars show in the sky */
+    .sky-night { background: linear-gradient(to bottom, rgba(2,6,18,0.5) 0%, rgba(2,6,18,0.3) 60%, rgba(0,0,0,0) 100%); opacity: 0; }  /* see-through so the fixed stars show in the sky */
     .cloud-layer { position: absolute; top: 0; left: 0; height: 80%; width: calc(var(--tile, 160svh) + 100vw);
       background-repeat: repeat-x; background-size: var(--tile, 160svh) 100%;
       will-change: transform; animation: cloud-drift var(--speed, 120s) linear infinite; }
@@ -244,14 +244,13 @@
     html::before { content: ''; position: fixed; inset: 0; z-index: -2; background: radial-gradient(ellipse at 72% 28%, #0a1226 0%, #03060e 52%, #000 100%); opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
     html[data-theme="dark"]::before { opacity: 1; }
 
-    /* sky: day -> night, clouds stay and drift, just dimmer */
+    /* sky: day -> night, clouds fade out and the stars take over */
     .cloud-layer { transition: opacity 0.4s ease; }
     .hero-video::after { transition: opacity 0.4s ease; }
     html[data-theme="dark"] .sky-day { opacity: 0; }
     html[data-theme="dark"] .sky-night { opacity: 1; }
     html[data-theme="dark"] .hero-video::after { opacity: 0; }
-    html[data-theme="dark"] .cloud-a { background-image: url('clouds-a-night.webp'); opacity: 0.8; }
-    html[data-theme="dark"] .cloud-b { background-image: url('clouds-b-night.webp'); opacity: 0.55; }
+    html[data-theme="dark"] .cloud-layer { opacity: 0; animation-play-state: paused; }   /* no clouds at night, just stars */
 
     /* stars: drawn once on canvases (see script), two layers twinkle with a cheap CSS opacity animation */
     #starfield { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0; transition: opacity 0.6s ease; }
@@ -808,9 +807,6 @@
         clearTimeout(t);
         t = setTimeout(() => { if (painted && (window.innerWidth !== lw || Math.abs(window.innerHeight - lh) > 150)) paint(); }, 200);
       });
-
-      // warm the night cloud images so the first switch to dark doesn't flash
-      (window.requestIdleCallback || (f => setTimeout(f, 1500)))(() => { new Image().src = 'clouds-a-night.webp'; new Image().src = 'clouds-b-night.webp'; });
     })();
 
     // ===== Theme toggle =====
