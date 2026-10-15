@@ -145,14 +145,14 @@
 
     /* Projects (frosted so the wallpaper still shows through) */
     .projects { background: rgba(248,250,252,0.55); margin: 0; max-width: 100%; padding: 100px 24px; }
-    .projects-container { max-width: 1200px; margin: 0 auto; }
-    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px; }
-    .project-card { background: var(--bg); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); transition: var(--transition); cursor: pointer; position: relative; }
+    .projects-container { max-width: 1000px; margin: 0 auto; }
+    .projects-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+    .project-card { background: var(--bg); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); transition: var(--transition); position: relative; }
     .project-card::before { content: ''; position: absolute; inset: 0; border-radius: var(--radius); border: 2px solid transparent; transition: var(--transition); pointer-events: none; }
     .project-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
     .project-card:hover::before { border-color: var(--accent); }
-    .project-image { width: 100%; height: 200px; background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); display: flex; align-items: center; justify-content: center; font-size: 3rem; position: relative; overflow: hidden; }
-    .project-image::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.1), transparent); }
+    .project-image { width: 100%; aspect-ratio: 16 / 9; background: #0b0b0f; position: relative; overflow: hidden; }
+    .project-image img { display: block; width: 100%; height: 100%; object-fit: contain; }
     .project-content { padding: 24px; }
     .project-content h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
     .project-content p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin-bottom: 16px; }
@@ -274,7 +274,6 @@
     html[data-theme="dark"] .projects { background: rgba(0,0,0,0.28); }
     html[data-theme="dark"] .project-card { background: #0a0a0a; }
     html[data-theme="dark"] .project-image { background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%); }
-    html[data-theme="dark"] .project-image::after { background: linear-gradient(to top, rgba(0,0,0,0.25), transparent); }
     html[data-theme="dark"] .social-btn:hover { box-shadow: 0 8px 24px rgba(96,165,250,0.2); }
     html[data-theme="dark"] .cursor-ring::before { border-color: rgba(96,165,250,0.55); background: rgba(96,165,250,0.08); }
     html[data-theme="dark"] .cursor-hover .cursor-ring::before { background: rgba(96,165,250,0.14); border-color: rgba(96,165,250,0.8); }
@@ -449,7 +448,9 @@
       </div>
       <div class="projects-grid">
         <div class="project-card reveal">
-          <div class="project-image" aria-hidden="true">🎧</div>
+          <div class="project-image">
+            <img src="assets/projects/youtube-music-analyzer.png" alt="YouTube Music Analyzer interface showing its year selector and video results area">
+          </div>
           <div class="project-content">
             <h3>YouTube Music Analyzer</h3>
             <p>Explore the most-viewed official music videos by year, ranked with data from the YouTube Data API.</p>
@@ -466,7 +467,9 @@
         </div>
 
         <div class="project-card reveal">
-          <div class="project-image" aria-hidden="true">📅</div>
+          <div class="project-image">
+            <img src="assets/projects/routine-scrapper-max.png" alt="Routine Scrapper Max interface showing today's class schedule">
+          </div>
           <div class="project-content">
             <h3>Routine Scrapper Max</h3>
             <p>A student routine companion for checking class schedules and updates on the web or Android.</p>
@@ -817,3 +820,4 @@
 
 </body>
 </html>
+
